@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+option java_package = "ru.algont.scada.application.adaptergrpc.proto";
+
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/timestamp.proto";
+
+extend google.protobuf.EnumValueOptions {
+ string type_tm_name = 25000;
+ string type_command = 50000;
+}
+
+enum ScadaTypeCommand {
+    CHANGE_TM = 0 [(type_command) = "CHANGE_TM"];
+    STATISTICS = 1 [(type_command) = "STATISTICS"];
+}
+
+enum ScadaTypeTm {
+    TI = 0 [(type_tm_name) = "TI"];
+    TS = 1 [(type_tm_name) = "TS"];
+    PTI = 2 [(type_tm_name) = "PTI"];
+    PTS = 3 [(type_tm_name) = "PTS"];
+}
+
+service scadaservice {
+    rpc OpenSession (ScadaVoid) returns (ScadaOpenSessionResponse);
+    rpc CloseSession (ScadaCloseSessionRequest) returns (ScadaCloseSessionResponse);
+    rpc sendCommandChangeTM (ScadaSendCommandChangeArray) returns (ScadaResltResponse);
+    rpc subscribeCommandChangeTM (stream ScadaSendCommandChangeArray) returns (stream ScadaSendCommandChangeArray);
+}
+
+message ScadaVoid {}
+
+message ScadaOpenSessionResponse {
+    string response_uuid_session = 1;
+}
+
+message ScadaCloseSessionRequest {
+    string response_uuid_session = 1;
+}
+
+message ScadaCloseSessionResponse {
+    string response_message = 1;
+    int32 response_code = 2;
+}
+
+message ScadaTm {
+    string id_tm = 1;
+    google.protobuf.Timestamp lower_time = 2;
+    google.protobuf.Timestamp upper_time = 3;
+    ScadaTypeTm type_tm = 4;
+    int32 value_ts = 5;
+    double value_ti = 6;
+    string value_str = 7;
+    int32 flag_tm = 8;
+}
+
+message ScadaSendCommandChangeArray {
+    repeated ScadaSendCommandChange core_command = 1;
+}
+
+message ScadaSendCommandChange {
+    ScadaTypeCommand scada_type_command = 1;
+    string response_from_uuid_session = 2;
+    string response_to_uuid_session = 3;
+    ScadaTm scada_tm = 4;
+    oneof event {
+        string uuid_session = 5;
+    }
+}
+
+message ScadaResltResponse {
+    string response_message = 1;
+    int32 response_code = 2;
+}

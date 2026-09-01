@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
+  },
+  "include": [
+    "vite.*.config.mts",
+    "vitest.config.mts",
+    "src",
+    "tests"
+  ],
+  "exclude": ["forge.config.ts"]
+}

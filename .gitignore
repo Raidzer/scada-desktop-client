@@ -1,0 +1,9 @@
+node_modules/
+.vite/
+out/
+coverage/
+output/
+.playwright-cli/
+*.log
+.DS_Store
+Thumbs.db

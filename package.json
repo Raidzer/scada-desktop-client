@@ -1,0 +1,53 @@
+{
+  "name": "scada-desktop-client",
+  "productName": "SCADA Desktop",
+  "version": "0.1.0",
+  "description": "Windows desktop client for the SCADA Java gRPC server",
+  "author": "Raidzer",
+  "main": ".vite/build/main.js",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "electron-forge start",
+    "dev": "electron-forge start",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.app.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "package": "electron-forge package",
+    "package:win": "electron-forge package --platform=win32 --arch=x64",
+    "make": "electron-forge make",
+    "make:win": "electron-forge make --platform=win32 --arch=x64",
+    "verify": "npm run typecheck && npm run test && npm run package"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "1.14.4",
+    "@grpc/proto-loader": "0.8.1",
+    "electron-squirrel-startup": "1.0.1"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "7.11.2",
+    "@electron-forge/maker-squirrel": "7.11.2",
+    "@electron-forge/plugin-fuses": "7.11.2",
+    "@electron-forge/plugin-vite": "7.11.2",
+    "@electron-forge/shared-types": "7.11.2",
+    "@electron/fuses": "1.8.0",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.6",
+    "@types/electron-squirrel-startup": "1.0.2",
+    "@types/node": "26.4.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "@phosphor-icons/react": "2.1.10",
+    "@vitejs/plugin-react": "5.2.0",
+    "electron": "44.1.0",
+    "jsdom": "29.1.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "typescript": "7.0.2",
+    "vite": "6.4.3",
+    "vitest": "3.2.7"
+  }
+}

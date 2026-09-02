@@ -1,0 +1,63 @@
+name: Windows build
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Verify and build Windows MSI
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22.12.0'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check TypeScript
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+
+      - name: Prepare portable WiX
+        if: github.event_name != 'pull_request'
+        run: npm run setup:wix
+
+      - name: Build MSI
+        if: github.event_name != 'pull_request'
+        run: npm run make:win
+
+      - name: Upload MSI artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: SCADA-Desktop-Windows-x64
+          path: 'out/make/wix/x64/SCADA Desktop.msi'
+          if-no-files-found: error
+          retention-days: 14

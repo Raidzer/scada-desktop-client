@@ -15,7 +15,7 @@
 - автоматическое переподключение с новой сессией и exponential backoff;
 - сохранение последнего адреса в `%APPDATA%/scada-desktop-client/settings.json`;
 - закрытие окна в системный трей; явный пункт «Выход» закрывает gRPC-сессию;
-- Windows x64 installer через Electron Forge / Squirrel.
+- Windows x64 MSI с русским мастером установки через Electron Forge / WiX.
 
 ## Архитектура
 
@@ -38,7 +38,8 @@ Renderer работает с `contextIsolation`, без Node.js и без пря
 
 ## Запуск разработки
 
-Требования: Windows, Node.js `>=22.12`, npm.
+Требования для разработки: Windows, Node.js `>=22.12`, npm. Для сборки MSI используется
+portable WiX Toolset `3.14.1`; пользователю готового установщика WiX не требуется.
 
 ```powershell
 npm ci
@@ -67,10 +68,24 @@ npm run package:win
 ## Сборка установщика
 
 ```powershell
+npm run setup:wix
 npm run make:win
 ```
 
-Результат появится в `out/make/squirrel.windows/x64/SCADA-Desktop-Setup.exe`.
+`setup:wix` нужен один раз: он загружает официальный архив WiX, проверяет SHA-256 и
+распаковывает инструменты в игнорируемую Git папку `.tools`. Права администратора для
+этого не требуются.
+
+Результат появится в `out/make/wix/x64/SCADA Desktop.msi`. Установщик работает на
+русском языке, устанавливает приложение для всего компьютера и позволяет выбрать
+каталог установки.
+
+## Автоматическая сборка
+
+Workflow `.github/workflows/windows-build.yml` запускает TypeScript-проверку и тесты
+для pull request в `develop`/`main`. При push в эти ветки, создании тега `v*` или
+ручном запуске из GitHub Actions он также собирает MSI и сохраняет его на 14 дней в
+артефакте `SCADA-Desktop-Windows-x64`.
 
 ## Важные ограничения прототипа
 

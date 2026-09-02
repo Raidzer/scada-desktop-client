@@ -8,7 +8,6 @@ import {
   Tray,
   type MenuItemConstructorOptions,
 } from 'electron';
-import started from 'electron-squirrel-startup';
 import { GrpcScadaTransport } from './scada/grpc-scada-transport';
 import { ScadaGateway } from './scada/scada-gateway';
 import { registerIpcHandlers } from './ipc';
@@ -22,14 +21,10 @@ let isQuitting = false;
 
 const TRAY_ICON_PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGmSURBVFhHYxBSNPo/kJgBXYDeeNQBow4g2QGipu4YYpRgkh2g1L0AQ4wSTJIDRLRt/2sfvvVf3DUcQ45cTJIDpCNzwA6QL2rDkCMXk+QApbbZYAeoLdmFIUcuJskBmjvPgx0AwtRKjEQ7ABTvMMtBWDajGlWNmvl/Ca8YDH2EMNEOAMU7sgNUZ21EkZf0T/yvueU0OKGi68WHiXaA2vytKA7Q3ncVxTJY+gDR6HrxYaIcIGLgiGo5FINyBViNmjlK+gCFBroZuDBRDpCOK8SwHOxbaKEEshBZnJSowHAAyDCN9UcxLEO2FG7RzvNg38OCnxAGmQvyDF4H4LMchEG5QX3VATgflPKRg58g3ncVvwPkchowNUEx2MegHFHRAxcDFUowNsjxhEJDsXEqfgcQg0G+RjcYhEEOQ1dLCJPlABAGJTR0B5BTSZHtAPSgBgU/uhpiMNkOkAxJwxu3xGKyHQDKfqAUDXMAOfUACJPvAEWj/yoTloEtB6UHdDliMUUOgJWQ5AY/CFPkAFgdQW7wgzBFDgBhShupFDuA0pYRxQ6gFA+4AwDlilN/wUJjPAAAAABJRU5ErkJggg==';
 
-if (started) {
-  app.quit();
-} else {
-  startApplication();
-}
+startApplication();
 
 function startApplication(): void {
-  app.setAppUserModelId('com.squirrel.ScadaDesktop.ScadaDesktop');
+  app.setAppUserModelId('com.raidzer.scada-desktop');
 
   const hasSingleInstanceLock = app.requestSingleInstanceLock();
   if (!hasSingleInstanceLock) {

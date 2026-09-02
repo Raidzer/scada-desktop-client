@@ -2,7 +2,7 @@
   "name": "scada-desktop-client",
   "productName": "SCADA Desktop",
   "version": "0.1.0",
-  "description": "Windows desktop client for the SCADA Java gRPC server",
+  "description": "Desktop client for the SCADA Java gRPC server",
   "author": "Raidzer",
   "main": ".vite/build/main.js",
   "private": true,
@@ -15,13 +15,15 @@
     "test:watch": "vitest",
     "package": "electron-forge package",
     "package:win": "electron-forge package --platform=win32 --arch=x64",
+    "package:linux": "electron-forge package --platform=linux --arch=x64",
     "setup:wix": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-wix.ps1",
     "make": "npm run make:win",
     "make:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/make-win.ps1",
+    "make:linux": "electron-forge make --platform=linux --arch=x64",
     "verify": "npm run typecheck && npm run test && npm run package"
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.13.0"
   },
   "dependencies": {
     "@grpc/grpc-js": "1.14.4",
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "7.11.2",
+    "@electron-forge/maker-deb": "7.11.2",
     "@electron-forge/maker-wix": "7.11.2",
     "@electron-forge/plugin-fuses": "7.11.2",
     "@electron-forge/plugin-vite": "7.11.2",

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { ForgeConfig } from '@electron-forge/shared-types';
+import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerWix } from '@electron-forge/maker-wix';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { VitePlugin } from '@electron-forge/plugin-vite';
@@ -49,45 +50,67 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerWix({
-      name: 'SCADA Desktop',
-      manufacturer: 'Raidzer',
-      language: 1049,
-      cultures: 'ru-ru',
-      arch: 'x64',
-      defaultInstallMode: 'perMachine',
-      programFilesFolderName: 'SCADA Desktop',
-      shortcutFolderName: 'SCADA Desktop',
-      shortcutName: 'SCADA Desktop',
-      appUserModelId: 'com.raidzer.scada-desktop',
-      upgradeCode: '7BCFA4CE-98AF-4358-8701-6E29E5C0A987',
-      ui: {
-        chooseDirectory: true,
+    new MakerWix(
+      {
+        name: 'SCADA Desktop',
+        manufacturer: 'Raidzer',
+        language: 1049,
+        cultures: 'ru-ru',
+        arch: 'x64',
+        defaultInstallMode: 'perMachine',
+        programFilesFolderName: 'SCADA Desktop',
+        shortcutFolderName: 'SCADA Desktop',
+        shortcutName: 'SCADA Desktop',
+        appUserModelId: 'com.raidzer.scada-desktop',
+        upgradeCode: '7BCFA4CE-98AF-4358-8701-6E29E5C0A987',
+        ui: {
+          chooseDirectory: true,
+        },
+        beforeCreate: (creator) => {
+          creator.wixTemplate = creator.wixTemplate
+            .replace(
+              'Name = "{{ApplicationName}} (Machine - MSI)"',
+              'Name = "{{ApplicationName}}"',
+            )
+            .replace(
+              'DowngradeErrorMessage="A later version of this product is already installed. Setup will now exit."',
+              'DowngradeErrorMessage="Более новая версия приложения уже установлена."',
+            )
+            .replace(
+              'Value="{{ApplicationName}} (Machine)"',
+              'Value="{{ApplicationName}}"',
+            )
+            .replace(
+              'Description="The complete package."',
+              'Description="Полная установка приложения."',
+            )
+            .replace(
+              'Title="Main Application" Level="1" Description="The main components to run the applications."',
+              'Title="Основные файлы" Level="1" Description="Файлы, необходимые для работы приложения."',
+            );
+        },
       },
-      beforeCreate: (creator) => {
-        creator.wixTemplate = creator.wixTemplate
-          .replace(
-            'Name = "{{ApplicationName}} (Machine - MSI)"',
-            'Name = "{{ApplicationName}}"',
-          )
-          .replace(
-            'DowngradeErrorMessage="A later version of this product is already installed. Setup will now exit."',
-            'DowngradeErrorMessage="Более новая версия приложения уже установлена."',
-          )
-          .replace(
-            'Value="{{ApplicationName}} (Machine)"',
-            'Value="{{ApplicationName}}"',
-          )
-          .replace(
-            'Description="The complete package."',
-            'Description="Полная установка приложения."',
-          )
-          .replace(
-            'Title="Main Application" Level="1" Description="The main components to run the applications."',
-            'Title="Основные файлы" Level="1" Description="Файлы, необходимые для работы приложения."',
-          );
+      ['win32'],
+    ),
+    new MakerDeb(
+      {
+        options: {
+          name: 'scada-desktop-client',
+          productName: 'SCADA Desktop',
+          genericName: 'SCADA client',
+          description: 'Клиент мониторинга и управления SCADA.',
+          productDescription:
+            'Настольный клиент для мониторинга телеметрии и отправки команд существующему Java SCADA-серверу.',
+          section: 'utils',
+          priority: 'optional',
+          maintainer: 'Raidzer',
+          bin: 'SCADA Desktop',
+          icon: path.resolve(__dirname, 'assets/scada-desktop.svg'),
+          categories: ['Utility'],
+        },
       },
-    }),
+      ['linux'],
+    ),
   ],
   plugins: [
     new VitePlugin({

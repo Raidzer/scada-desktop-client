@@ -24,7 +24,9 @@ const TRAY_ICON_PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAX
 startApplication();
 
 function startApplication(): void {
-  app.setAppUserModelId('com.raidzer.scada-desktop');
+  if (process.platform === 'win32') {
+    app.setAppUserModelId('com.raidzer.scada-desktop');
+  }
 
   const hasSingleInstanceLock = app.requestSingleInstanceLock();
   if (!hasSingleInstanceLock) {

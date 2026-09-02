@@ -1,8 +1,8 @@
 # SCADA Desktop
 
-Прототип Windows-клиента для существующего Java SCADA-сервера. В одном репозитории
+Прототип настольного клиента для существующего Java SCADA-сервера. В одном репозитории
 находятся React GUI и локальный Electron/gRPC-шлюз; сам Java-сервер остаётся внешней
-системой.
+системой. Сборки подготовлены для Windows и Astra Linux 1.8 x86-64.
 
 ## Что реализовано
 
@@ -15,7 +15,8 @@
 - автоматическое переподключение с новой сессией и exponential backoff;
 - сохранение последнего адреса в `%APPDATA%/scada-desktop-client/settings.json`;
 - закрытие окна в системный трей; явный пункт «Выход» закрывает gRPC-сессию;
-- Windows x64 MSI с русским мастером установки через Electron Forge / WiX.
+- Windows x64 MSI с русским мастером установки через Electron Forge / WiX;
+- Astra Linux x86-64 DEB-пакет с ярлыком в меню приложений.
 
 ## Архитектура
 
@@ -38,8 +39,9 @@ Renderer работает с `contextIsolation`, без Node.js и без пря
 
 ## Запуск разработки
 
-Требования для разработки: Windows, Node.js `>=22.12`, npm. Для сборки MSI используется
-portable WiX Toolset `3.14.1`; пользователю готового установщика WiX не требуется.
+Требования для разработки: Node.js `>=22.13`, npm. Для сборки MSI на Windows используется
+portable WiX Toolset `3.14.1`; пользователю готового установщика WiX не требуется. Для
+сборки DEB нужна Linux-среда с `dpkg` и `fakeroot`.
 
 ```powershell
 npm ci
@@ -67,6 +69,8 @@ npm run package:win
 
 ## Сборка установщика
 
+### Windows x64
+
 ```powershell
 npm run setup:wix
 npm run make:win
@@ -80,12 +84,32 @@ npm run make:win
 русском языке, устанавливает приложение для всего компьютера и позволяет выбрать
 каталог установки.
 
+### Astra Linux x86-64
+
+Сборка выполняется в Astra Linux, Debian или Ubuntu:
+
+```bash
+sudo apt-get install fakeroot dpkg
+npm ci
+npm run make:linux
+```
+
+Результат появится в `out/make/deb/x64/`. Установка пакета:
+
+```bash
+sudo apt install ./out/make/deb/x64/scada-desktop-client_0.1.0_amd64.deb
+```
+
+После установки приложение доступно в меню рабочего стола и по команде
+`scada-desktop-client`.
+
 ## Автоматическая сборка
 
-Workflow `.github/workflows/windows-build.yml` запускает TypeScript-проверку и тесты
+Workflow `.github/workflows/desktop-build.yml` запускает TypeScript-проверку и тесты
 для pull request в `develop`/`main`. При push в эти ветки, создании тега `v*` или
-ручном запуске из GitHub Actions он также собирает MSI и сохраняет его на 14 дней в
-артефакте `SCADA-Desktop-Windows-x64`.
+ручном запуске из GitHub Actions он параллельно собирает и сохраняет на 14 дней два
+артефакта: `SCADA-Desktop-Windows-x64` с MSI и
+`SCADA-Desktop-Astra-Linux-x64` с DEB.
 
 ## Важные ограничения прототипа
 
@@ -103,6 +127,8 @@ Workflow `.github/workflows/windows-build.yml` запускает TypeScript-п�
   пользователи, роли, аудит, история и автообновление — отдельные следующие этапы.
 - Прототипный installer пока не подписан сертификатом; Windows может показать
   предупреждение SmartScreen. Подпись нужна перед распространением пользователям.
+- DEB ориентирован на Astra Linux 1.8 x86-64. Работу трея и системных библиотек нужно
+  проверить на реальной целевой машине; Astra Linux 1.7 и ARM64 пока не заявлены.
 
 Исходный protobuf-контракт сохранён по полям и номерам. Импорты Google protobuf в
 локальной копии переставлены перед `extend`, потому что актуальный Node proto-loader

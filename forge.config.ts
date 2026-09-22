@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { ForgeConfig } from '@electron-forge/shared-types';
-import { MakerDeb } from '@electron-forge/maker-deb';
+import { MakerDeb, type MakerDebConfig } from '@electron-forge/maker-deb';
 import { MakerWix } from '@electron-forge/maker-wix';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { VitePlugin } from '@electron-forge/plugin-vite';
@@ -21,6 +21,27 @@ const packageLock = JSON.parse(
 const productionPackageRoots = Object.entries(packageLock.packages ?? {})
   .filter(([location, entry]) => location.startsWith('node_modules/') && entry.dev !== true)
   .map(([location]) => `/${location.replaceAll('\\', '/')}`);
+
+type LegacyCompatibleDebOptions = NonNullable<MakerDebConfig['options']> & {
+  compression: 'xz';
+};
+
+const linuxDebOptions: LegacyCompatibleDebOptions = {
+  name: 'scada-desktop-client',
+  productName: 'SCADA Desktop',
+  genericName: 'SCADA client',
+  description: 'Клиент мониторинга и управления SCADA.',
+  productDescription:
+    'Настольный клиент для мониторинга телеметрии и отправки команд существующему Java SCADA-серверу.',
+  section: 'utils',
+  priority: 'optional',
+  maintainer: 'Raidzer',
+  bin: 'SCADA Desktop',
+  icon: path.resolve(__dirname, 'assets/scada-desktop.svg'),
+  categories: ['Utility'],
+  // Astra Linux 1.7 ships an older dpkg that cannot read control.tar.zst.
+  compression: 'xz',
+};
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -94,20 +115,7 @@ const config: ForgeConfig = {
     ),
     new MakerDeb(
       {
-        options: {
-          name: 'scada-desktop-client',
-          productName: 'SCADA Desktop',
-          genericName: 'SCADA client',
-          description: 'Клиент мониторинга и управления SCADA.',
-          productDescription:
-            'Настольный клиент для мониторинга телеметрии и отправки команд существующему Java SCADA-серверу.',
-          section: 'utils',
-          priority: 'optional',
-          maintainer: 'Raidzer',
-          bin: 'SCADA Desktop',
-          icon: path.resolve(__dirname, 'assets/scada-desktop.svg'),
-          categories: ['Utility'],
-        },
+        options: linuxDebOptions,
       },
       ['linux'],
     ),

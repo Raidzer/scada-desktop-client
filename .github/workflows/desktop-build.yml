@@ -80,7 +80,7 @@ jobs:
           retention-days: 14
 
   build-astra-linux:
-    name: Build Astra Linux DEB
+    name: Build Astra Linux 1.7/1.8 DEB
     if: github.event_name != 'pull_request'
     needs: verify
     runs-on: ubuntu-latest
@@ -104,6 +104,9 @@ jobs:
 
       - name: Build DEB
         run: npm run make:linux
+
+      - name: Verify Astra Linux 1.7 compatibility
+        run: npm run verify:deb
 
       - name: Upload DEB artifact
         uses: actions/upload-artifact@v7

@@ -20,6 +20,7 @@
     "make": "npm run make:win",
     "make:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/make-win.ps1",
     "make:linux": "electron-forge make --platform=linux --arch=x64",
+    "verify:deb": "node scripts/verify-deb-compression.mjs",
     "verify": "npm run typecheck && npm run test && npm run package"
   },
   "engines": {
